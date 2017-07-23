@@ -42,7 +42,37 @@ class ReportView(MethodView):
         if file_type in self.FILE_HEADER and report_id:
             report = Report.query.filter_by(id=report_id).first()
             if report:
-                pass
+                return self.get_response_for_file(file_type, report)
+        return '', NO_CONTENT
+
+    def get_response_for_file(self, file_type, report):
+        """Return full response depend on file type"""
+        if file_type == 'pdf':
+            generated_report = self._get_report_pdf(report)
+        response = app.make_response(generated_report.getvalue())
+        return response
+
+    def _get_report_pdf(self, report):
+        """Return generated report in pdf from rendered html template"""
+        pdf = StringIO()
+        pisa.CreatePDF(StringIO(self._get_render_template(report)), pdf)
+        return pdf
+
+    def _get_render_template(self, report):
+        return render_template('report.html',
+                               **self._get_report_context(report))
+
+    @staticmethod
+    def _get_report_context(report):
+        """Return context for rendering template"""
+        data = json.loads(report.data)
+        return {
+            'organization': data['organization'],
+            'inventory': data['inventory'],
+            'reported_at': data['reported_at'],
+            'created_at': data['created_at'],
+        }
+
 
 app.add_url_rule('/report/<file_type>/<int:report_id>',
                  view_func=ReportView.as_view('report_view'))

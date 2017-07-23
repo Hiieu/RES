@@ -2,9 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <style>
+        #organization{
+            margin-left: 400px;
+        }
+        #title, #inventory p{
+            text-align: center;
+        }
+        #inventory, #organization{
+            font-size: 200%;
+        }
+        #inventory{
+            margin-top: 100000px;
+        }
+        #title{
+            font-size: 400%;
+        }
+    </style>
 </head>
 <body>
-
+    <h1 id="title">The Report</h1>
+    <div id="organization">
+        <p>Organization: {{ organization }}</p>
+        <p>Reported: {{ reported_at }}</p>
+        <p>Created: {{ created_at }}</p>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div id="inventory">
+        {% for i in inventory %}
+            <p>{{ i.name }}: {{ i.price }}</p>
+        {% endfor %}
+    </div>
 </body>
 </html>
