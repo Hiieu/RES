@@ -29,17 +29,20 @@ class Report(db.Model):
 
 class ReportView(MethodView):
 
-    FILE_HEADER = {
+    # Header content response for generated file
+    FILE_HDR_CONT = {
         'pdf': {
+            'content_disposition': 'inline; filename=Report_{0}.pdf',
             'content_type': 'application/pdf'
         },
         'xml': {
+            'content_disposition': 'inline; filename=Report_{0}.pdf',
             'content_type': 'application/xml'
         }
     }
 
     def get(self, file_type, report_id):
-        if file_type in self.FILE_HEADER and report_id:
+        if file_type in self.FILE_HDR_CONT and report_id:
             report = Report.query.filter_by(id=report_id).first()
             if report:
                 return self.get_response_for_file(file_type, report)
@@ -50,6 +53,11 @@ class ReportView(MethodView):
         if file_type == 'pdf':
             generated_report = self._get_report_pdf(report)
         response = app.make_response(generated_report.getvalue())
+        response.headers['Content-Type'] = \
+            self.FILE_HDR_CONT[file_type]['content_type']
+        response.headers['Content-Disposition'] = \
+            self.FILE_HDR_CONT[file_type]['content_disposition'].format(
+                report.id)
         return response
 
     def _get_report_pdf(self, report):
