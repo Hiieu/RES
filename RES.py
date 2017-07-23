@@ -1,5 +1,7 @@
-from StringIO import StringIO
+from dicttoxml import dicttoxml
 from httplib import NO_CONTENT
+from StringIO import StringIO
+from xhtml2pdf import pisa
 
 from flask import (
     Flask,
@@ -8,7 +10,6 @@ from flask import (
 )
 from flask.views import MethodView
 from flask_sqlalchemy import SQLAlchemy
-from xhtml2pdf import pisa
 
 app = Flask(__name__)
 app.config.update(
@@ -50,9 +51,12 @@ class ReportView(MethodView):
 
     def get_response_for_file(self, file_type, report):
         """Return full response depend on file type"""
+        generated_report = ''
         if file_type == 'pdf':
-            generated_report = self._get_report_pdf(report)
-        response = app.make_response(generated_report.getvalue())
+            generated_report = self._get_report_pdf(report).getvalue()
+        elif file_type == 'xml':
+            generated_report = dicttoxml(self._get_report_context(report))
+        response = app.make_response(generated_report)
         response.headers['Content-Type'] = \
             self.FILE_HDR_CONT[file_type]['content_type']
         response.headers['Content-Disposition'] = \
