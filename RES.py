@@ -37,7 +37,7 @@ class ReportView(MethodView):
             'content_type': 'application/pdf'
         },
         'xml': {
-            'content_disposition': 'inline; filename=Report_{0}.pdf',
+            'content_disposition': 'inline; filename=Report_{0}.xml',
             'content_type': 'application/xml'
         }
     }
